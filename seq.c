@@ -118,7 +118,7 @@ read_int(const char *nptr, const char *name) {
 	char *endptr;
 	errno = 0;
 	int64_t value = strtoll(nptr, &endptr, 10);
-	if (nptr[0] == '\0' || *endptr == '\0') {
+	if (nptr[0] == '\0' || *endptr != '\0') {
 		errx(1, "%s is not a number: %s", name, nptr);
 	}
 	if (errno == ERANGE) {
@@ -137,13 +137,14 @@ printnum(int64_t num) {
 		num *= -1;
 	}
 
-	if (num == 0) {
+	if (num <= 20) {
 		printf("%s\n", simple_nums[num]);
 		return;
 	}
 
-	for (n = num, e = 0, pow = 1; n > 1000; n /= 1000, e++, pow *= 1000);
+	for (n = num, e = 0, pow = 1; n >= 1000; n /= 1000, e++, pow *= 1000);
 
+	int sol = 1;	// start of line
 	for ( ; e >= 0; e--, pow /= 1000 ) {
 		int part = num / pow;
 		num -= part * pow;
@@ -153,14 +154,22 @@ printnum(int64_t num) {
 		}
 
 		if (part >= 100) {
-			printf("%s hundred", simple_nums[part/100]);
+			printf("%s%s hundred", sol ? "" : " ", simple_nums[part/100]);
+			sol = 0;
 			part %= 100;
-			if (part > 0) {
-				printf(" and ");
+			if (part == 0) {
+				if (e > 0) printf(" %s", units[e]);
+				continue;
 			}
+			printf(" and");
+		} else if (part > 0 && e == 0 && !sol) {
+			printf(" and");
 		}
 
 		if (part > 0) {
+		        if (!sol) {
+				printf(" ");
+			}
 			if (part < 20) {
 				printf("%s", simple_nums[part]);
 			} else if (part % 10 == 0) {
@@ -168,10 +177,12 @@ printnum(int64_t num) {
 			} else {
 				printf("%s-%s", tens[part/10], simple_nums[part%10]);
 			}
+			sol = 0;
 		}
 
 		if (e > 0) {
-			printf(" %s%s", units[e], num ? " " : "");
+			printf("%s%s", sol ? "" : " ", units[e]);
+			sol = 0;
 		}
 	}
 	printf("\n");
