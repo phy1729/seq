@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+
+seq() { ./seq "$@"; }
+
+testcases=(
+  [0]=zero
+  [1]=one
+  [2]=two
+  [10]=ten
+  [12]=twelve
+  [23]=twenty-three
+  [44]=forty-four
+  [100]='one hundred'
+  [101]='one hundred and one'
+  [110]='one hundred and ten'
+  [100000]='one hundred thousand'
+  [100001]='one hundred thousand and one'
+  [123456]='one hundred and twenty-three thousand four hundred and fifty-six'
+  [1000000]='one million'
+  [1000001]='one million and one'
+  [1100001]='one million one hundred thousand and one' 
+)  
+
+fail=0
+for n in "${!testcases[@]}"; do
+  output=$(seq "$n"{,})
+  if [[ $output = "${testcases[n]}" ]]; then
+    printf 'PASS '
+  else
+    ((fail++))
+    printf 'FAIL '
+  fi
+  printf '%s output:<%s> expected:<%s>\n' "$n" "$output" "${testcases[n]}"
+done
+
+for n in "${!testcases[@]}"; do
+  output=$(seq "-$n"{,})
+  if [[ $n = 0 && $output = zero ]]; then
+    printf 'PASS %s output:<%s> expected:<%s>\n' "-$n" "$output" "zero"
+    continue
+  elif [[ $output = "minus ${testcases[n]}" ]]; then
+    printf 'PASS '
+  else
+    ((fail++))
+    printf 'FAIL '
+  fi
+  printf '%s output:<%s> expected:<%s>\n' "-$n" "$output" "minus ${testcases[n]}"
+done
+
+(( fail == 0 ))

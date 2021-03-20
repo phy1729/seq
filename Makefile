@@ -1,3 +1,4 @@
+.PHONY: all test clean
 CFLAGS ?= -O2
 WERROR ?= -Werror
 CFLAGS += \
@@ -5,7 +6,6 @@ CFLAGS += \
 	-Wall \
 	-Wcast-qual \
 	-Wextra \
-	-Wextra-semi-stmt \
 	-Wformat=2 \
 	-Wpedantic \
 	-Wpointer-arith \
@@ -14,11 +14,13 @@ CFLAGS += \
 	-Wsign-conversion \
 	-Wstack-protector \
 	-Wstrict-aliasing=2 \
-	-Wunreachable-code-break \
 	-Wwrite-strings \
 	-fno-common
 
 all: seq
+
+test: all
+	./tests
 
 clean:
 	rm -f seq
