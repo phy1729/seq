@@ -118,7 +118,7 @@ read_int(const char *nptr, const char *name) {
 	char *endptr;
 	errno = 0;
 	int64_t value = strtoll(nptr, &endptr, 10);
-	if (nptr[0] == '\0' || *endptr == '\0') {
+	if (nptr[0] == '\0' || *endptr != '\0') {
 		errx(1, "%s is not a number: %s", name, nptr);
 	}
 	if (errno == ERANGE) {
@@ -142,7 +142,7 @@ printnum(int64_t num) {
 		return;
 	}
 
-	for (n = num, e = 0, pow = 1; n > 1000; n /= 1000, e++, pow *= 1000);
+	for (n = num, e = 0, pow = 1; n >= 1000; n /= 1000, e++, pow *= 1000);
 
 	for ( ; e >= 0; e--, pow /= 1000 ) {
 		int part = num / pow;
