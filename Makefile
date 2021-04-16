@@ -18,5 +18,8 @@ CFLAGS += \
 
 all: seq
 
+test: all
+	./run-tests
+
 clean:
 	rm -f seq

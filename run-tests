@@ -1,0 +1,40 @@
+#!/bin/sh
+
+exit=0
+while read -r n expected; do
+	printf '1..2\n'
+	i=0
+	for prefix in '' -; do
+		out=$(./seq "$prefix$n" "$prefix$n")
+		if [ "$prefix" = - ] && [ "$n" != 0 ]; then
+			expected="minus $expected"
+		fi
+
+		if [ "$out" = "$expected" ]; then
+			printf 'ok %s %s\n' "$i" "$expected"
+		else
+			printf 'not ok %s %s : %s\n' "$i" "$expected" "$out"
+			exit=1
+		fi
+		: $(( i = i + 1 ))
+	done
+done <<-'EOF'
+	0	zero
+	1	one
+	2	two
+	10	ten
+	12	twelve
+	23	twenty-three
+	44	forty-four
+	100	one hundred
+	101	one hundred and one
+	110	one hundred and ten
+	100000	one hundred thousand
+	100001	one hundred thousand one
+	123456	one hundred and twenty-three thousand four hundred and fifty-six
+	1000000	one million
+	1000001	one million one
+	1100001	one million one hundred thousand one
+EOF
+
+exit "$exit"
